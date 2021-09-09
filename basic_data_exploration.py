@@ -7,8 +7,7 @@ melbourne_data = pd.read_csv(melbourne_file_path)
 melbourne_data = melbourne_data.dropna(axis=0)
 
 y = melbourne_data.Price
-
-melbourne_features = ['Rooms', 'Bathroom', 'Landsize', 'Lattitude', 'Longtitude']
+melbourne_features = ['Rooms', 'Bathroom', 'Landsize', 'BuildingArea', 'YearBuilt', 'Lattitude', 'Longtitude']
 X = melbourne_data[melbourne_features]
 # print(X.describe())
 # print(X.head())
@@ -16,10 +15,25 @@ X = melbourne_data[melbourne_features]
 from sklearn.tree import DecisionTreeRegressor
 
 # 모델 정의. random_state를 지정해서 항상 같은 결과가 나올 수 있도록 설정
-melbourne_model = DecisionTreeRegressor(random_state=1)
+melbourne_model = DecisionTreeRegressor()
 melbourne_model.fit(X, y)
 
-print('예측을 진행할 집')
-print(X.head())
-print('예측결과는')
-print(melbourne_model.predict(X.head()))
+# print('예측을 진행할 집')
+# print(X.head())
+# print('예측결과는')
+# print(melbourne_model.predict(X.head()))
+
+
+from sklearn.metrics import mean_absolute_error
+
+predicted_home_prices = melbourne_model.predict(X)
+# print(mean_absolute_error(y, predicted_home_prices))
+
+
+from sklearn.model_selection import train_test_split
+train_X, val_X, train_y, val_y = train_test_split(X, y, random_state = 0)
+melbourne_model = DecisionTreeRegressor()
+melbourne_model.fit(train_X, train_y)
+
+val_predictions = melbourne_model.predict(val_X)
+print(mean_absolute_error(val_y, val_predictions))
