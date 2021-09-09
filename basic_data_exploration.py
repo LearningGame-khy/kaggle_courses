@@ -12,28 +12,22 @@ X = melbourne_data[melbourne_features]
 # print(X.describe())
 # print(X.head())
 
+from sklearn.metrics import mean_absolute_error
 from sklearn.tree import DecisionTreeRegressor
 
-# 모델 정의. random_state를 지정해서 항상 같은 결과가 나올 수 있도록 설정
-melbourne_model = DecisionTreeRegressor()
-melbourne_model.fit(X, y)
+def get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y):
+    model = DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes, random_state=0)
+    model.fit(train_X, train_y)
 
-# print('예측을 진행할 집')
-# print(X.head())
-# print('예측결과는')
-# print(melbourne_model.predict(X.head()))
-
-
-from sklearn.metrics import mean_absolute_error
-
-predicted_home_prices = melbourne_model.predict(X)
-# print(mean_absolute_error(y, predicted_home_prices))
+    preds_val = model.predict(val_X)
+    mae = mean_absolute_error(val_y, preds_val)
+    return mae
 
 
 from sklearn.model_selection import train_test_split
-train_X, val_X, train_y, val_y = train_test_split(X, y, random_state = 0)
-melbourne_model = DecisionTreeRegressor()
-melbourne_model.fit(train_X, train_y)
 
-val_predictions = melbourne_model.predict(val_X)
-print(mean_absolute_error(val_y, val_predictions))
+train_X, val_X, train_y, val_y = train_test_split(X, y, random_state=0)
+
+for max_leaf_nodes in [5, 50, 500, 5000]:
+    my_mae = get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y)
+    print(f"Max Leaf: {max_leaf_nodes}, MAE: {my_mae}")
